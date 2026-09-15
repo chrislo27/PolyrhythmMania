@@ -3,8 +3,6 @@ package polyrhythmmania.world.entity
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector3
-import paintbox.util.ColorStack
-import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.input.InputScore
 import polyrhythmmania.engine.input.InputTimingRestriction
@@ -55,26 +53,23 @@ class EntityInputFeedback(world: World, val end: End, baseColor: Color, val inpu
 
     override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
         val tintedRegion = getTintedRegion(tileset)
-        val tmpColor = ColorStack.getAndPush().set(tintedRegion.color.getOrCompute()) // tintedRegion's color is likely just white
+        val tmpColor = Color(tintedRegion.color.getOrCompute()) // tintedRegion's color is likely just white
         tmpColor.mul(this.currentColor)
         drawTintedRegion(batch, vec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tmpColor)
-        ColorStack.pop()
     }
 
     override fun renderLightingEffect(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         val flash = this.currentFlashPercentage
         if (flash > 0f) {
-            val tmpVec = Vector3Stack.getAndPush()
+            val tmpVec = Vector3()
             val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
             val packedColor = batch.packedColor
 
             val tintedRegion = getTintedRegion(tileset)
-            val tmpColor = ColorStack.getAndPush().set(this.currentBaseColor)
+            val tmpColor = Color(this.currentBaseColor)
             tmpColor.a *= flash * 0.4f
             drawTintedRegion(batch, convertedVec, tileset, tintedRegion, 0f, 0f, renderWidth, renderHeight, tmpColor)
-            ColorStack.pop()
             
-            Vector3Stack.pop()
             batch.packedColor = packedColor
         }
     }

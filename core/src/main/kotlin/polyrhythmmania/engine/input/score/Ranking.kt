@@ -1,7 +1,6 @@
 package polyrhythmmania.engine.input.score
 
 import com.badlogic.gdx.graphics.Color
-import polyrhythmmania.engine.input.score.Ranking.Companion.getRanking
 
 
 /**

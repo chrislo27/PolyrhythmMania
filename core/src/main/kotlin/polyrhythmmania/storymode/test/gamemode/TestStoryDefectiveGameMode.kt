@@ -2,9 +2,7 @@ package polyrhythmmania.storymode.test.gamemode
 
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.editor.block.BlockDeployRod
-import polyrhythmmania.editor.block.BlockDespawnPattern
 import polyrhythmmania.editor.block.storymode.BlockDeployRodStoryMode
-import polyrhythmmania.engine.input.InputTimingRestriction
 
 
 class TestStoryDefectiveGameMode(main: PRManiaGame) : TestStoryGameMode(main) {

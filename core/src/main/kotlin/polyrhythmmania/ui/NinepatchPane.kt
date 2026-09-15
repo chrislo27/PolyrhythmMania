@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.Batch
 import paintbox.binding.IntVar
 import paintbox.binding.Var
 import paintbox.ui.Pane
-import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawUV
 import kotlin.math.min
 
@@ -30,7 +29,7 @@ open class NinepatchPane : Pane() {
         val lastPackedColor = batch.packedColor
 
         val opacity: Float = this.apparentOpacity.get()
-        val tmpColor = ColorStack.getAndPush().set(color.getOrCompute())
+        val tmpColor = Color(color.getOrCompute())
         tmpColor.a *= opacity
         batch.color = tmpColor
         val cornerSize = this.cornerSize.get().toFloat()
@@ -68,7 +67,6 @@ open class NinepatchPane : Pane() {
                     third, third, 1f - third, 1f - third)
         }
 
-        ColorStack.pop()
         batch.packedColor = lastPackedColor
     }
 }

@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.math.Interpolation
-import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.screen.play.pause.TengokuPauseBackground
 
@@ -31,21 +30,17 @@ class StoryPlayGradientRenderer(cycleSpeedMultiplier: Float = 1f) : TengokuPause
         }
         
         val offsetPosition = (position - (1f / colors.size) + 1f) % 1f
-        val topColor = ColorStack.getAndPush().set(1f, 1f, 1f, 1f)
-        val bottomColor = ColorStack.getAndPush().set(1f, 1f, 1f, 1f)
+        val topColor = Color(1f, 1f, 1f, 1f)
+        val bottomColor = Color(1f, 1f, 1f, 1f)
         
         interpolateColor(bottomColor, position)
         interpolateColor(topColor, offsetPosition)
-        val inbetweenColor = ColorStack.getAndPush().set(topColor).lerp(bottomColor, 0.5f)
+        val inbetweenColor = Color(topColor).lerp(bottomColor, 0.5f)
 
         // Arg order: bottom left, bottom right, top right, top left
         batch.drawQuad(0f, 0f, inbetweenColor, width, 0f, bottomColor,
                 width, height, inbetweenColor, 0f, height, topColor)
         batch.setColor(1f, 1f, 1f, 1f)
-        
-        repeat(3) {
-            ColorStack.pop()
-        }
     }
     
     private fun interpolateColor(color: Color, position: Float) {

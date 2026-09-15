@@ -3,7 +3,6 @@ package polyrhythmmania.editor
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.IntMap
@@ -15,7 +14,6 @@ import polyrhythmmania.editor.music.Summary
 import polyrhythmmania.editor.music.Waveform
 import polyrhythmmania.editor.pane.dialog.MusicDialog
 import kotlin.math.ceil
-import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 

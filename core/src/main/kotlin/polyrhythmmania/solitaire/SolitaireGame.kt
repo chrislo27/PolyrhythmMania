@@ -14,7 +14,6 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
 import paintbox.packing.PackedSheet
 import paintbox.ui.*
-import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.maxX
 import paintbox.util.gdxutils.maxY
@@ -612,7 +611,7 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
         val lastPackedColor = batch.packedColor
 
         val opacity: Float = this.apparentOpacity.get()
-        val tmpColor: Color = ColorStack.getAndPush().set(1f, 1f, 1f, 1f)
+        val tmpColor = Color(1f, 1f, 1f, 1f)
         tmpColor.a *= opacity
         
         batch.color = tmpColor
@@ -667,7 +666,6 @@ class SolitaireGame(val deck: List<Card> = Card.STANDARD_DECK.toList().shuffled(
         
         paintboxFont.end()
 
-        ColorStack.pop()
         batch.packedColor = lastPackedColor
         
         // Right click to cancel when NOT clicking this element

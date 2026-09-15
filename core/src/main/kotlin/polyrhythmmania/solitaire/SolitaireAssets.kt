@@ -2,9 +2,7 @@ package polyrhythmmania.solitaire
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.assets.loaders.TextureLoader
 import com.badlogic.gdx.audio.Sound
-import com.badlogic.gdx.graphics.Texture
 import paintbox.packing.Packable
 import paintbox.packing.PackedSheet
 import paintbox.packing.PackedSheetLoader

@@ -1,14 +1,12 @@
 package polyrhythmmania.screen
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.Screen
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.glutils.FrameBuffer
 import com.badlogic.gdx.graphics.glutils.GLFrameBuffer
 import com.badlogic.gdx.graphics.glutils.HdpiUtils
 import com.badlogic.gdx.utils.Align
@@ -26,16 +24,9 @@ import paintbox.ui.control.Button
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.gdxutils.disposeQuietly
-import paintbox.util.gdxutils.drawQuad
-import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.PRMania
 import polyrhythmmania.PRManiaGame
 import polyrhythmmania.PRManiaScreen
-import polyrhythmmania.container.Container
-import java.io.PrintWriter
-import java.io.StringWriter
-import java.net.URI
 import kotlin.system.exitProcess
 
 

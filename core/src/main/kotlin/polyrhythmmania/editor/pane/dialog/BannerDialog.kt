@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.Var
 import paintbox.filechooser.FileExtFilter
+import paintbox.filechooser.TinyFDWrapper
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet
 import paintbox.registry.AssetRegistry
@@ -21,7 +22,6 @@ import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.filechooser.TinyFDWrapper
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
@@ -89,7 +89,7 @@ class BannerDialog(editorPane: EditorPane, val afterDialogClosed: () -> Unit) : 
             val border = Insets(4f)
             this.border.set(border)
             this.borderStyle.set(SolidBorder(Color.WHITE).apply {
-                this.roundedCorners.set(true)
+                this.roundedOffCorners.set(true)
             })
             this.bounds.height.set(160f + border.top + border.bottom)
             this.bounds.width.bind { 

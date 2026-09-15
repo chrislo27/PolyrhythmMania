@@ -17,7 +17,6 @@ import paintbox.ui.*
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.element.RectElement
-import paintbox.util.ColorStack
 import paintbox.util.DecimalFormats
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
@@ -319,7 +318,6 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             val h = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
 
-            val tmpColor = ColorStack.getAndPush()
             val trackView = editorPane.editor.trackView
             val trackViewBeat = trackView.beat.get()
             val leftBeat = floor(trackViewBeat)
@@ -328,7 +326,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
             val lineWidth = 2f
 
             // Playback start
-            val tempoColor = ColorStack.getAndPush().set(PRManiaColors.TEMPO)
+            val tempoColor = Color(PRManiaColors.TEMPO)
             val triangle = AssetRegistry.get<Texture>("ui_triangle_equilateral")
             val triangleSize = 12f
 
@@ -359,14 +357,13 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                     if (beat !in (leftBeat - 2)..(rightBeat + 1)) continue
 
                     if (tc === clickOriginalTc) {
-                        val ghostColor = ColorStack.getAndPush().set(tempoColor)
+                        val ghostColor = Color(tempoColor)
                         val a = ghostColor.a
                         ghostColor.a = 1f
                         ghostColor.r *= 0.5f * a
                         ghostColor.g *= 0.5f * a
                         ghostColor.b *= 0.5f * a
                         drawTempoChange(batch, ghostColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, tc.newTempo, null)
-                        ColorStack.pop()
                     } else {
                         drawTempoChange(batch, tempoColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, tc.newTempo, font)
                     }
@@ -377,10 +374,7 @@ class TempoTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tr
                     drawTempoChange(batch, tempoColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, hoveredTempoChange.newTempo, font)
                 }
             }
-            ColorStack.pop()
 
-
-            ColorStack.pop()
             batch.packedColor = lastPackedColor
         }
 

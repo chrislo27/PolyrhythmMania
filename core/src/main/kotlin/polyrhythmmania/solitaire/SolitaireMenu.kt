@@ -160,6 +160,7 @@ class SolitaireMenu(menuCol: MenuCollection) : StandardMenu(menuCol), SolitaireG
 
     override fun renderSelf(originX: Float, originY: Float, batch: Batch) {
         if (loading) {
+            @Suppress("UnusedExpression")
             SolitaireMusic // Initialize music loading
             val progress = SolitaireAssets.load(Gdx.graphics.deltaTime)
             if (progress >= 1f && SolitaireMusic.isReady()) {

@@ -1,7 +1,6 @@
 package polyrhythmmania.editor.pane.track
 
 import paintbox.binding.BooleanVar
-import paintbox.binding.Var
 import paintbox.ui.Pane
 import paintbox.ui.control.ScrollBar
 import polyrhythmmania.ui.PRManiaSkins

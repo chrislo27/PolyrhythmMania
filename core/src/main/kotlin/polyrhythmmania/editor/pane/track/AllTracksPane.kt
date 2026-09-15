@@ -6,7 +6,6 @@ import paintbox.ui.Pane
 import paintbox.ui.area.Insets
 import paintbox.ui.border.SolidBorder
 import paintbox.ui.control.ScrollPane
-import paintbox.ui.control.ScrollPaneSkin
 import polyrhythmmania.editor.TrackView
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.ui.PRManiaSkins

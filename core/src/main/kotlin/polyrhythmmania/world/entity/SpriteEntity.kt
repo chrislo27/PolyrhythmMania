@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
-import paintbox.util.ColorStack
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
 import polyrhythmmania.world.tileset.Tileset
@@ -23,7 +22,7 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
     abstract fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion?
 
     override fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3) {
-        val tmpColor = ColorStack.getAndPush()
+        val tmpColor = Color()
         val tint = this.tint
         for (i in 0..<numLayers) {
             val tr = getTintedRegion(tileset, i)
@@ -43,7 +42,6 @@ abstract class SpriteEntity(world: World) : SimpleRenderedEntity(world) {
                 drawTintedRegion(batch, vec, tileset, tr, pxOffsetX, pxOffsetY, renderWidth, renderHeight, tmpColor)
             }
         }
-        ColorStack.pop()
     }
 
     override fun setCullingRect(rect: Rectangle, tmpVec3: Vector3) {

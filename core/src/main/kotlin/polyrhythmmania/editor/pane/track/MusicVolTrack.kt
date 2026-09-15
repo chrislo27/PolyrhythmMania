@@ -13,7 +13,6 @@ import paintbox.binding.BooleanVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
-import paintbox.util.ColorStack
 import paintbox.util.DecimalFormats
 import paintbox.util.MathHelper
 import paintbox.util.gdxutils.*
@@ -241,7 +240,6 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
             val h = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
 
-            val tmpColor = ColorStack.getAndPush()
             val trackView = editorPane.editor.trackView
             val trackViewBeat = trackView.beat.get()
             val leftBeat = floor(trackViewBeat)
@@ -250,7 +248,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
             val lineWidth = 2f
 
             // Playback start
-            val musicVolColor = ColorStack.getAndPush().set(PRManiaColors.MUSIC_VOLUME)
+            val musicVolColor = Color(PRManiaColors.MUSIC_VOLUME)
             val triangle = AssetRegistry.get<Texture>("ui_triangle_equilateral")
             val triangleSize = 12f
 
@@ -280,14 +278,13 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                     val beat = mv.beat
                     if (beat <= (rightBeat + 1) && (beat + mv.width) >= (leftBeat - 2)) {
                         if (mv === clickOriginalTc) {
-                            val ghostColor = ColorStack.getAndPush().set(musicVolColor)
+                            val ghostColor = Color(musicVolColor)
                             val a = ghostColor.a
                             ghostColor.a = 1f
                             ghostColor.r *= 0.5f * a
                             ghostColor.g *= 0.5f * a
                             ghostColor.b *= 0.5f * a
                             drawMusicVol(batch, ghostColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, mv.width, mv.newVolume, null)
-                            ColorStack.pop()
                         } else {
                             drawMusicVol(batch, musicVolColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, mv.width, mv.newVolume, font)
                         }
@@ -303,10 +300,7 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                     drawMusicVol(batch, musicVolColor, x, y, h, trackView, lineWidth, triangle, triangleSize, beat, hoveredMusicVol.width, hoveredMusicVol.newVolume, font)
                 }
             }
-            ColorStack.pop()
 
-
-            ColorStack.pop()
             batch.packedColor = lastPackedColor
         }
 
@@ -322,8 +316,8 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                         y - h, triangleSize, triangleSize)
             } else {
                 // Gradient
-                val leftColor = ColorStack.getAndPush()
-                val rightColor = ColorStack.getAndPush()
+                val leftColor = Color()
+                val rightColor = Color()
                 val leftX = x + trackView.translateBeatToX(beat)
                 val rightX = x + trackView.translateBeatToX(beat + mvWidth)
 
@@ -336,9 +330,6 @@ class MusicVolTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane,
                         rightX, y - h, rightColor,
                         rightX, y, rightColor,
                         leftX, y, leftColor)
-
-                ColorStack.pop()
-                ColorStack.pop()
 
                 // Borders
                 batch.color = color

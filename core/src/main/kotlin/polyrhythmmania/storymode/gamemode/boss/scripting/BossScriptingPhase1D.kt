@@ -2,7 +2,6 @@ package polyrhythmmania.storymode.gamemode.boss.scripting
 
 import polyrhythmmania.engine.Event
 import polyrhythmmania.storymode.gamemode.boss.EntityRodPRStoryBoss
-import polyrhythmmania.storymode.gamemode.boss.scripting.BossScriptPhase1D.VariantFactory
 import polyrhythmmania.storymode.music.StoryMusicAssets
 import kotlin.random.asKotlinRandom
 

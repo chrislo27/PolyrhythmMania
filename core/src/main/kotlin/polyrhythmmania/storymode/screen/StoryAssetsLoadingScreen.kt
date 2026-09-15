@@ -25,6 +25,7 @@ class StoryAssetsLoadingScreen(main: PRManiaGame, unloadAssets: Boolean, doAfter
         private fun loadAction(delta: Float): Boolean {
             return if (StoryAssets.load(delta) >= 1f) {
                 SolitaireAssets.loadBlocking()
+                @Suppress("UnusedExpression")
                 BossPatterns
 
                 true

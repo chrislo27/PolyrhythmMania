@@ -8,7 +8,6 @@ import paintbox.binding.FloatVar
 import paintbox.binding.IntVar
 import paintbox.binding.ReadOnlyIntVar
 import paintbox.binding.Var
-import paintbox.font.Markup
 import paintbox.font.PaintboxFont
 import paintbox.font.TextAlign
 import paintbox.packing.PackedSheet

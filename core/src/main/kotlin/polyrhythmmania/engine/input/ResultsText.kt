@@ -3,9 +3,7 @@ package polyrhythmmania.engine.input
 import com.badlogic.gdx.math.MathUtils
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
-import paintbox.util.sumOfFloat
 import polyrhythmmania.Localization
-import kotlin.math.abs
 
 data class ResultsText(
         val title: String?,

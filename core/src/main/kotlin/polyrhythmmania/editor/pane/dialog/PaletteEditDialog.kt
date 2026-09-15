@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.Disposable
 import com.eclipsesource.json.Json
@@ -25,7 +26,6 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.Matrix4Stack
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
@@ -586,7 +586,7 @@ class PaletteEditDialog(
             cam.update()
 
             batch.end()
-            val prevMatrix = Matrix4Stack.getAndPush().set(batch.projectionMatrix)
+            val prevMatrix = Matrix4(batch.projectionMatrix)
             batch.projectionMatrix = cam.combined
             val frameBuffer = editor.previewFrameBuffer
             if (frameBuffer != null) {
@@ -598,8 +598,6 @@ class PaletteEditDialog(
             }
             batch.projectionMatrix = prevMatrix
             batch.begin()
-
-            Matrix4Stack.pop()
             
             batch.packedColor = lastPackedColor
         }

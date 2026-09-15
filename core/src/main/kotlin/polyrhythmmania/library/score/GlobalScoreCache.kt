@@ -8,7 +8,6 @@ import polyrhythmmania.PRMania
 import java.io.File
 import java.time.Instant
 import java.util.*
-import java.util.function.Consumer
 
 
 object GlobalScoreCache {

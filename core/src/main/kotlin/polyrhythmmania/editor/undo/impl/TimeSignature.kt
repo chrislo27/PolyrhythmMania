@@ -2,7 +2,6 @@ package polyrhythmmania.editor.undo.impl
 
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.undo.ReversibleAction
-import polyrhythmmania.engine.music.MusicVolume
 import polyrhythmmania.engine.timesignature.TimeSignature
 
 

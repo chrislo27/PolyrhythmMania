@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.PixmapIO
 import paintbox.util.gdxutils.disposeQuietly
 import polyrhythmmania.soundsystem.sample.MusicSample
-import java.io.File
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 

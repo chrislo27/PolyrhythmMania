@@ -22,7 +22,6 @@ import paintbox.ui.UIElement
 import paintbox.ui.contextmenu.ContextMenu
 import paintbox.util.DecimalFormats
 import paintbox.util.MathHelper
-import paintbox.util.Vector2Stack
 import paintbox.util.WindowSize
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
@@ -1379,7 +1378,7 @@ class Editor(
 
         val allTracksPane = editorPane.allTracksPane
         val currentClick = click.getOrCompute()
-        val vec = sceneRoot.screenToUI(Vector2Stack.getAndPush().set(screenX.toFloat(), screenY.toFloat()))
+        val vec = sceneRoot.screenToUI(Vector2(screenX.toFloat(), screenY.toFloat()))
         if (currentClick is Click.CreateSelection || currentClick is Click.DragSelection || currentClick is Click.MoveMarker) {
             allTracksPane.editorTrackArea.onMouseMovedOrDragged(vec.x, vec.y)
             inputConsumed = true
@@ -1387,7 +1386,7 @@ class Editor(
 
         this.suggestPanCameraDir = 0
         if (currentClick is Click.PansCameraOnDrag && panWhenDraggingAtEdge.getOrCompute()) {
-            val thisPos = allTracksPane.getPosRelativeToRoot(Vector2Stack.getAndPush())
+            val thisPos = allTracksPane.getPosRelativeToRoot(Vector2())
             thisPos.x = vec.x - thisPos.x
             thisPos.y = vec.y - thisPos.y
 
@@ -1399,12 +1398,8 @@ class Editor(
             if (thisPos.x + bufferZone > thisWidth) {
                 this.suggestPanCameraDir = +1
             }
-
-            Vector2Stack.pop()
         }
 
-        Vector2Stack.pop()
-        
         inputConsumed = sceneRoot.inputSystem.touchDragged(screenX, screenY, pointer) || inputConsumed
 
         return inputConsumed

@@ -3,8 +3,8 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import paintbox.ui.*
-import paintbox.util.ColorStack
+import paintbox.ui.ImageNode
+import paintbox.ui.ImageRenderingMode
 import paintbox.util.gdxutils.drawRect
 
 
@@ -26,18 +26,14 @@ class OverallWavePane(musicDialog: MusicDialog) : AbstrWavePane(musicDialog) {
         val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
-        val tmpColor: Color = ColorStack.getAndPush()
-        tmpColor.set(Color.WHITE)
-
         val window = musicDialog.window
         val durationSec = window.musicDurationSec.get()
         val windowX = (window.x.get() / durationSec) * w
         val windowW = (window.widthSec.get() / durationSec) * w
 
-        batch.color = tmpColor
+        batch.color = Color.WHITE
         batch.drawRect(x + windowX, y - h, windowW, h, 2f)
 
-        ColorStack.pop()
         batch.packedColor = lastPackedColor
     }
 

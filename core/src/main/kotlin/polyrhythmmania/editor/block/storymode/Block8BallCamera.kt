@@ -41,7 +41,6 @@ class Event8BallCameraPan(engine: Engine, startBeat: Float, width: Float) : Even
     private lateinit var camera: OrthographicCamera
     private val originalCameraPos: Vector3 = Vector3()
     
-    // These don't use Vector3Stack due to threading issues with the ResourceStack
     private val tmpVec1: Vector3 = Vector3()
     private val tmpVec2: Vector3 = Vector3()
     

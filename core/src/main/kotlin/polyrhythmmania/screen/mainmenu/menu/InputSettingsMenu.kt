@@ -21,7 +21,6 @@ import paintbox.util.gdxutils.grey
 import polyrhythmmania.Localization
 import polyrhythmmania.Settings
 import polyrhythmmania.engine.input.InputKeymapKeyboard
-import polyrhythmmania.screen.mainmenu.menu.InputSettingsMenu.PendingKeyboardBinding
 import polyrhythmmania.ui.PRManiaSkins
 
 

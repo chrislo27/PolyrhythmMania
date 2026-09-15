@@ -2,27 +2,29 @@ package polyrhythmmania.editor.pane.track
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.FloatVar
 import paintbox.binding.Var
 import paintbox.font.TextAlign
 import paintbox.registry.AssetRegistry
 import paintbox.ui.*
-import paintbox.util.ColorStack
 import paintbox.ui.area.Insets
 import paintbox.ui.control.TextLabel
 import paintbox.ui.layout.VBox
-import paintbox.util.Vector2Stack
+import paintbox.util.DecimalFormats
 import paintbox.util.gdxutils.*
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.Click
 import polyrhythmmania.editor.PlayState
 import polyrhythmmania.editor.Tool
-import polyrhythmmania.editor.undo.impl.*
+import polyrhythmmania.editor.undo.impl.AddTimeSignatureAction
+import polyrhythmmania.editor.undo.impl.ChangeTimeSignatureAction
+import polyrhythmmania.editor.undo.impl.DeleteTimeSignatureAction
 import polyrhythmmania.engine.timesignature.TimeSignature
-import paintbox.util.DecimalFormats
 import polyrhythmmania.util.LelandSpecialChars
 import polyrhythmmania.util.TimeUtils
 import kotlin.math.ceil
@@ -131,7 +133,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             val shift = Gdx.input.isShiftDown()
             val alt = Gdx.input.isAltDown()
             if (event is MouseInputEvent) {
-                val lastMouseRelative = Vector2Stack.getAndPush()
+                val lastMouseRelative = Vector2()
                 val thisPos = beatMarkerPane.getPosRelativeToRoot(lastMouseRelative)
                 lastMouseRelative.x = event.x - thisPos.x
                 lastMouseRelative.y = event.y - thisPos.y
@@ -177,8 +179,6 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                         }
                     }
                 }
-
-                Vector2Stack.pop()
             } else if (event is Scrolled) {
                 if (currentTool == Tool.TIME_SIGNATURE && !control && !alt && !shift) {
                     val targetBeat = this.currentTimeSigBeat
@@ -225,7 +225,7 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             val h = renderBounds.height.get()
             val lastPackedColor = batch.packedColor
 
-            val tmpColor = ColorStack.getAndPush()
+            val tmpColor = Color()
             val trackView = editor.trackView
             val trackViewBeat = trackView.beat.get()
             val trackViewScale = trackView.renderScale.get()
@@ -256,17 +256,16 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
             val triangleSize = 12f
             val currentClick = editor.click.getOrCompute()
             if (currentClick is Click.MoveMarker) {
-                val tmpColor2 = ColorStack.getAndPush().set(currentClick.type.color)
+                val tmpColor2 = Color(currentClick.type.color)
                 val playbackStartOld = currentClick.originalPosition
                 val premul = 0.25f * tmpColor2.a
                 batch.setColor(tmpColor2.r * premul, tmpColor2.g * premul, tmpColor2.b * premul, 1f)
                 batch.fillRect(x + trackView.translateBeatToX(playbackStartOld), y - h, lineWidth, h)
                 batch.draw(triangle, x + trackView.translateBeatToX(playbackStartOld) - triangleSize / 2 + lineWidth / 2,
                         y, triangleSize, -triangleSize)
-                ColorStack.pop()
             }
 
-            val tmpColor2 = ColorStack.getAndPush()
+            val tmpColor2 = Color()
             editor.markerMap.values.forEach { marker ->
                 val playbackStart = marker.beat.get()
                 tmpColor2.set(marker.type.color)
@@ -285,14 +284,12 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                             y - 4f, 0f, Align.right, false)
                 }
             }
-            ColorStack.pop()
 
             if (editor.playState.getOrCompute() != PlayState.STOPPED) {
                 val pos = editor.engineBeat.get()
-                val tmpColor3 = ColorStack.getAndPush().set(editorPane.palette.trackPlayback.getOrCompute())
+                val tmpColor3 = Color(editorPane.palette.trackPlayback.getOrCompute())
                 batch.color = tmpColor3
                 batch.fillRect(x + trackView.translateBeatToX(pos), y - h, lineWidth, h)
-                ColorStack.pop()
             }
 
             // Draw beat numbers
@@ -354,7 +351,6 @@ class BeatTrack(allTracksPane: AllTracksPane) : LongTrackPane(allTracksPane, tru
                 timeSignaturesToRender.clear()
             }
 
-            ColorStack.pop()
             batch.packedColor = lastPackedColor
         }
     }

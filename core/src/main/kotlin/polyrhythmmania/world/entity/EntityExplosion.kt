@@ -2,7 +2,6 @@ package polyrhythmmania.world.entity
 
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector3
-import paintbox.util.Vector3Stack
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
@@ -73,7 +72,7 @@ class EntityExplosion(
     override fun renderLightingEffect(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
         if (this.isKilled || this.percentageLife !in 0f..1f) return
 
-        val tmpVec = Vector3Stack.getAndPush()
+        val tmpVec = Vector3()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor
 
@@ -88,7 +87,6 @@ class EntityExplosion(
         
         renderSimple(renderer, batch, tileset, convertedVec)
 
-        Vector3Stack.pop()
         batch.packedColor = packedColor
     }
 

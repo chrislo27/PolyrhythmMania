@@ -3,7 +3,6 @@ package polyrhythmmania.editor.pane.dialog
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import paintbox.binding.IntVar
-import paintbox.util.ColorStack
 import kotlin.system.measureNanoTime
 
 
@@ -45,7 +44,7 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
         val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
-        val tmpColor: Color = ColorStack.getAndPush()
+        val tmpColor = Color()
         tmpColor.set(Color.WHITE)
 
         val window = musicDialog.window
@@ -65,7 +64,6 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
             batch.draw(tex, x, y - h, w, h)
         }
 
-        ColorStack.pop()
         batch.packedColor = lastPackedColor
     }
 
@@ -78,9 +76,6 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
         val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
-        val tmpColor: Color = ColorStack.getAndPush()
-        tmpColor.set(Color.WHITE)
-
         val window = musicDialog.window
         val durationSec = window.musicDurationSec.get()
         val windowX = (window.x.get() / durationSec) * w
@@ -89,7 +84,6 @@ class ZoomedWavePane(musicDialog: MusicDialog, val overallPane: OverallWavePane)
 //        batch.color = tmpColor
 //        batch.drawRect(x + windowX, y - h, windowW, h, 2f)
 
-        ColorStack.pop()
         batch.packedColor = lastPackedColor
     }
 

@@ -33,8 +33,8 @@ open class BasicDialog(val main: PRManiaGame, mergeTopAndContent: Boolean) : Dia
             this.bounds.height.set(720f)
             this.margin.set(Insets(8f))
             this.border.set(Insets(4f))
-            this.borderStyle.set(SolidBorder(Color.WHITE).apply { 
-                this.roundedCorners.set(true)
+            this.borderStyle.set(SolidBorder(Color.WHITE).apply {
+                roundedOffCorners.set(true)
             })
             this.padding.set(Insets(40f))
         }

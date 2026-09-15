@@ -3,7 +3,6 @@ package polyrhythmmania.storymode.gamemode.boss.scripting
 import polyrhythmmania.engine.Event
 import polyrhythmmania.storymode.gamemode.boss.pattern.BossPatternPools
 import polyrhythmmania.storymode.gamemode.boss.pattern.PatternPool
-import polyrhythmmania.storymode.gamemode.boss.scripting.BossScriptPhase1C.VariantFactory
 import polyrhythmmania.storymode.music.StoryMusicAssets
 import kotlin.random.asKotlinRandom
 

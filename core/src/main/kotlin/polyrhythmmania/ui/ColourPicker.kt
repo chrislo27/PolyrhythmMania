@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
 import paintbox.binding.IntVar
@@ -23,8 +24,6 @@ import paintbox.ui.layout.VBox
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.Skin
 import paintbox.ui.skin.SkinFactory
-import paintbox.util.ColorStack
-import paintbox.util.Vector2Stack
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.Localization
 import polyrhythmmania.PRManiaGame
@@ -339,8 +338,8 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = UIElement.de
             val lastPackedColor = batch.packedColor
 
             val opacity: Float = this.apparentOpacity.get()
-            val tmpColor: Color = ColorStack.getAndPush()
-            val tmpColor2: Color = ColorStack.getAndPush()
+            val tmpColor = Color()
+            val tmpColor2 = Color()
             tmpColor.set(leftColor.getOrCompute())
             tmpColor.a *= opacity
             tmpColor2.set(rightColor.getOrCompute())
@@ -349,8 +348,6 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = UIElement.de
             batch.drawQuad(x, y - h, tmpColor, x + w, y - h, tmpColor2,
                     x + w, y, tmpColor2, x, y, tmpColor)
 
-            ColorStack.pop()
-            ColorStack.pop()
             batch.packedColor = lastPackedColor
         }
     }
@@ -365,15 +362,13 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = UIElement.de
             addInputEventListener { event ->
                 if (event is MouseInputEvent) {
                     if (event is TouchDragged || (event is ClickPressed && event.button == Input.Buttons.LEFT)) {
-                        val lastMouseRelative = Vector2Stack.getAndPush()
+                        val lastMouseRelative = Vector2()
                         val thisPos = this.getPosRelativeToRoot(lastMouseRelative)
                         lastMouseRelative.x = event.x - thisPos.x
                         lastMouseRelative.y = event.y - thisPos.y
 
                         val percentage = (lastMouseRelative.x / bounds.width.get()).coerceIn(0f, 1f)
                         value.set(MathUtils.lerp(minValue.toFloat(), maxValue.toFloat(), percentage).toInt().coerceIn(minValue, maxValue))
-
-                        Vector2Stack.pop()
 
                         event !is TouchDragged // TouchDragged should not consume
                     } else false
@@ -394,14 +389,13 @@ open class ColourPicker(val hasAlpha: Boolean, font: PaintboxFont = UIElement.de
 
             val percentage = (value.get() - minValue) / (maxValue - minValue).toFloat()
             val opacity: Float = this.apparentOpacity.get()
-            val tmpColor: Color = ColorStack.getAndPush().set(1f, 1f, 1f, 1f)
+            val tmpColor = Color(1f, 1f, 1f, 1f)
             tmpColor.a *= opacity
             batch.color = tmpColor
             val tex = AssetRegistry.get<Texture>("ui_colour_picker_arrow")
             val size = h / 2
             batch.draw(tex, x - size / 2 + (w * percentage), y - h, size, size)
 
-            ColorStack.pop()
             batch.packedColor = lastPackedColor
         }
     }

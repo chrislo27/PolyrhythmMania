@@ -56,6 +56,7 @@ object StockTexturePacks {
     }
     
     init {
+        @Suppress("UnusedExpression")
         TexturePackSource // Forces initialization of companion object and objects inside TexturePackSource
     }
     

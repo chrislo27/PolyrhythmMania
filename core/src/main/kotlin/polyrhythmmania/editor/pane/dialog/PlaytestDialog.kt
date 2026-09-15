@@ -75,7 +75,7 @@ class PlaytestDialog(editorPane: EditorPane) : EditorDialog(editorPane, mergeTop
                 this.bounds.width.bind { (bounds.height.use() - borderSize * 2) * 16f / 9f + borderSize * 2 }
                 this.border.set(Insets(borderSize))
                 this.borderStyle.set(SolidBorder(Color.WHITE).apply {
-                    this.roundedCorners.set(true)
+                    this.roundedOffCorners.set(true)
                 })
             }
             vbox += editorPane.toolbar.createPlaybackButtonSet().apply {

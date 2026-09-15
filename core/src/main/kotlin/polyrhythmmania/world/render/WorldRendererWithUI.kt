@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import paintbox.PaintboxGame
 import paintbox.binding.*
@@ -29,8 +30,6 @@ import paintbox.ui.element.RectElement
 import paintbox.ui.layout.ColumnarPane
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.ColorStack
-import paintbox.util.Matrix4Stack
 import paintbox.util.gdxutils.*
 import paintbox.util.wave.WaveUtils
 import polyrhythmmania.Localization
@@ -532,7 +531,7 @@ duration: ${monster.activeDuration.get()} sec
 
                 // Prepare shape renderer
                 val shapeRenderer = main.shapeRenderer
-                val oldProjMtx = Matrix4Stack.getAndPush().set(shapeRenderer.projectionMatrix)
+                val oldProjMtx = Matrix4().set(shapeRenderer.projectionMatrix)
                 shapeRenderer.projectionMatrix = batch.projectionMatrix
 
                 val maxSquareSize = 350f
@@ -552,7 +551,7 @@ duration: ${monster.activeDuration.get()} sec
                     val squareSize = interpolation.apply(0f, maxSquareSize, prog)
 
                     val lastPackedColor = batch.packedColor
-                    val tmpColor = ColorStack.getAndPush()
+                    val tmpColor = Color()
                     tmpColor.set(Color.YELLOW)
 
                     tmpColor.a = alpha
@@ -567,12 +566,10 @@ duration: ${monster.activeDuration.get()} sec
                     )
 
                     batch.packedColor = lastPackedColor
-                    ColorStack.pop()
                 }
 
                 // End using shape renderer
                 shapeRenderer.projectionMatrix.set(oldProjMtx)
-                Matrix4Stack.pop()
 
                 val paintboxFont = main.fontGamePracticeClear
                 paintboxFont.useFont { font ->
@@ -1201,14 +1198,14 @@ duration: ${monster.activeDuration.get()} sec
                                 this.bounds.width.set(4f)
                                 this.bindHeightToSelfWidth()
                                 this.border.set(Insets(2f))
-                                this.borderStyle.set(SolidBorder(Color.WHITE).apply { this.roundedCorners.set(true) })
+                                this.borderStyle.set(SolidBorder(Color.WHITE).apply { roundedOffCorners.set(true) })
                             }
                             this += RectElement(Color.WHITE).apply { 
                                 Anchor.BottomLeft.configure(this, offsetY = -20f)
                                 this.bounds.width.set(4f) 
                                 this.bindHeightToSelfWidth()
                                 this.border.set(Insets(2f))
-                                this.borderStyle.set(SolidBorder(Color.WHITE).apply { this.roundedCorners.set(true) })
+                                this.borderStyle.set(SolidBorder(Color.WHITE).apply { roundedOffCorners.set(true) })
                             }
                         }
                         

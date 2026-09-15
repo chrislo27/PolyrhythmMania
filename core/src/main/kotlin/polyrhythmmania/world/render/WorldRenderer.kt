@@ -1,12 +1,10 @@
 package polyrhythmmania.world.render
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.GL20
-import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.*
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Matrix4
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector3
 import com.badlogic.gdx.utils.Disposable
 import com.badlogic.gdx.utils.Scaling
@@ -15,7 +13,8 @@ import paintbox.binding.BooleanVar
 import paintbox.framebuffer.FrameBufferManager
 import paintbox.framebuffer.FrameBufferManager.BufferSettings
 import paintbox.registry.AssetRegistry
-import paintbox.util.*
+import paintbox.util.DecimalFormats
+import paintbox.util.WindowSize
 import paintbox.util.gdxutils.NestedFrameBuffer
 import paintbox.util.gdxutils.disposeQuietly
 import paintbox.util.gdxutils.intersects
@@ -205,11 +204,11 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
         val bottomEdge = camera.position.y - camHeight / 2f
         val currentTileset = this.tileset
 
-        val visibleAreaRect = RectangleStack.getAndPush().set(leftEdge, bottomEdge, camWidth, camHeight)
+        val visibleAreaRect = Rectangle().set(leftEdge, bottomEdge, camWidth, camHeight)
         val entityRenderTime = measureNanoTime {
             var entitiesRendered = 0
-            val tmpEntityVec = Vector3Stack.getAndPush()
-            val tmpEntityRect = RectangleStack.getAndPush()
+            val tmpEntityVec = Vector3()
+            val tmpEntityRect = Rectangle()
             
             world.sortEntitiesByRenderOrder()
             world.entities.forEach { entity ->
@@ -229,8 +228,6 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                 }
             }
             
-            RectangleStack.pop()
-            Vector3Stack.pop()
             
             this.entitiesRenderedLastCall = entitiesRendered
         }
@@ -267,8 +264,8 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             // Entities either block or emit light
             batch.setColor(1f, 1f, 1f, 1f)
             this.entityRenderTimeNano += measureNanoTime {
-                val tmpEntityVec = Vector3Stack.getAndPush()
-                val tmpEntityRect = RectangleStack.getAndPush()
+                val tmpEntityVec = Vector3()
+                val tmpEntityRect = Rectangle()
                 
                 if (world.entities.any { it is HasLightingRender }) {
 //                    world.sortEntitiesByRenderOrder(WorldRenderer.comparatorRenderOrderLighting)
@@ -300,9 +297,6 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                         }
                     }
                 }
-                
-                RectangleStack.pop()
-                Vector3Stack.pop()
             }
             
             batch.end()
@@ -317,7 +311,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             val spotlights = world.spotlights
 
             // Clear with ambient light colour
-            ColorStack.use { tmpColor ->
+            Color().let { tmpColor ->
                 spotlights.ambientLight.computeFinalForAmbientLight(tmpColor)
                 Gdx.gl.glClearColor(tmpColor.r, tmpColor.g, tmpColor.b, 1f)
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -337,7 +331,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             batch.projectionMatrix = this.camera.combined
             
             // Render each spotlight, this IGNORES entity blocking
-            Vector3Stack.use { tmpVec ->
+            Vector3().let { tmpVec ->
                 val lightTex = AssetRegistry.get<Texture>("world_light_spotlight")
                 val lightTexAspectRatio = lightTex.height.toFloat() / lightTex.width
                 val width = 1.25f
@@ -346,9 +340,7 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
                         continue
                     }
                     convertWorldToScreen(tmpVec.set(spotlight.position))
-                    ColorStack.use { tmp ->
-                        batch.color = spotlight.lightColor.computeFinalForSpotlight(tmp)
-                    }
+                    batch.color = spotlight.lightColor.computeFinalForSpotlight(Color())
                     batch.draw(lightTex, tmpVec.x - width / 2f, tmpVec.y, width, width * lightTexAspectRatio)
                 }
             }
@@ -372,8 +364,6 @@ open class WorldRenderer(val world: World, val tileset: Tileset) : Disposable, W
             batch.setBlendFunction(oldSrcFunc, oldDstFunc)
             batch.projectionMatrix = tmpMatrix
         }
-        
-        RectangleStack.pop() // visibleAreaRect
         
         if (mainFb != null) {
             mainFb.end()

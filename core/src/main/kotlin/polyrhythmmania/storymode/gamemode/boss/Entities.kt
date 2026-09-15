@@ -1,14 +1,13 @@
 package polyrhythmmania.storymode.gamemode.boss
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Vector3
 import paintbox.packing.PackedSheet
-import paintbox.util.ColorStack
 import paintbox.util.MathHelper
-import paintbox.util.Vector3Stack
 import paintbox.util.wave.WaveUtils
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.storymode.StoryAssets
@@ -58,8 +57,7 @@ abstract class AbstractEntityBossRobot(
     
     protected fun renderSimple(renderer: WorldRenderer, batch: Batch, tileset: Tileset, vec: Vector3, updateOffsets: Boolean) {
         val oldPackedColor = batch.packedColor
-        val tmpColor = ColorStack.getAndPush()
-            .set(1f, 1f, 1f, 1f)
+        val tmpColor = Color(1f, 1f, 1f, 1f)
         
         val hurtFlash = bossGameMode.modifierModule.bossHealth.hurtFlash.get()
         tmpColor.lerp(1f, 0.35f, 0.35f, 1f, hurtFlash)
@@ -101,7 +99,6 @@ abstract class AbstractEntityBossRobot(
             batch.draw(StoryAssets.get<Texture>(textureID), vec.x, vec.y, renderWidth, renderHeight)
         }
         batch.packedColor = oldPackedColor
-        ColorStack.pop()
     }
 
     override fun shouldApplyRenderCulling(): Boolean = false
@@ -163,7 +160,7 @@ class EntityBossRobotFace(world: World, bossGameMode: StoryBossGameMode, initial
     var currentFace: Face = Face.NEUTRAL
 
     override fun renderLightingEffect(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
-        val tmpVec = Vector3Stack.getAndPush()
+        val tmpVec = Vector3()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor
 
@@ -177,7 +174,6 @@ class EntityBossRobotFace(world: World, bossGameMode: StoryBossGameMode, initial
         
         renderSimple(renderer, batch, tileset, convertedVec, updateOffsets = false)
 
-        Vector3Stack.pop()
         batch.packedColor = packedColor
     }
 
@@ -227,13 +223,10 @@ class EntityBossExplosion(
         if (isKilled) return
         
         val oldPackedColor = batch.packedColor
-        val tmpColor = ColorStack.getAndPush()
-            .set(1f, 1f, 1f, 1f)
 
-        batch.color = tmpColor
+        batch.setColor(1f, 1f, 1f, 1f)
         batch.draw(getTextureRegion(), vec.x, vec.y, renderWidth, renderHeight)
         batch.packedColor = oldPackedColor
-        ColorStack.pop()
     }
     
     private fun getCurrentIndex(): Int = (percentageLife * NUM_FRAMES).toInt().coerceIn(0, NUM_FRAMES - 1)
@@ -243,13 +236,12 @@ class EntityBossExplosion(
     }
 
     override fun renderLightingEffect(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
-        val tmpVec = Vector3Stack.getAndPush()
+        val tmpVec = Vector3()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor
 
         renderSimple(renderer, batch, tileset, convertedVec)
 
-        Vector3Stack.pop()
         batch.packedColor = packedColor
     }
 

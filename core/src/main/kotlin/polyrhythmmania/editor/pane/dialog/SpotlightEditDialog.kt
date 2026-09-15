@@ -24,7 +24,6 @@ import paintbox.ui.layout.ColumnarVBox
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
 import paintbox.ui.skin.Skin
-import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawRect
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.Localization
@@ -560,7 +559,7 @@ class SpotlightEditDialog(
             val lastPackedColor = batch.packedColor
             val opacity = element.apparentOpacity.get()
 
-            val rectColor: Color = ColorStack.getAndPush()
+            val rectColor = Color()
 
             rectColor.set(1f, 1f, 1f, 1f)
             rectColor.a *= opacity
@@ -587,7 +586,6 @@ class SpotlightEditDialog(
             }
             
             batch.packedColor = lastPackedColor
-            ColorStack.pop()
 
             val text = element.internalTextBlock.getOrCompute()
             if (text.runs.isNotEmpty()) {
@@ -597,7 +595,7 @@ class SpotlightEditDialog(
                 val textW = textBounds.width.get()
                 val textH = textBounds.height.get()
 
-                val tmpColor = ColorStack.getAndPush()
+                val tmpColor = Color()
                 tmpColor.set(batch.color).mul(textColorToUse.getOrCompute())
                 tmpColor.a *= opacity
 
@@ -629,7 +627,6 @@ class SpotlightEditDialog(
                     batch, textX + xOffset, textY - textH + yOffset,
                     if (compressX) (textW) else 0f, element.textAlign.getOrCompute(), scaleX, scaleY
                 )
-                ColorStack.pop()
             }
 
             batch.packedColor = lastPackedColor

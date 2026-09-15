@@ -1,7 +1,6 @@
 package polyrhythmmania.soundsystem.beads.ugen
 
 import net.beadsproject.beads.core.AudioContext
-import net.beadsproject.beads.core.UGenChain
 import net.beadsproject.beads.ugens.BiquadFilter
 import net.beadsproject.beads.ugens.Gain
 

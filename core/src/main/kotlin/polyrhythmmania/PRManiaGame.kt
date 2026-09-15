@@ -69,6 +69,7 @@ import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 
 
+@Suppress("UnusedExpression")
 class PRManiaGame(paintboxSettings: IPaintboxSettings)
     : PaintboxGame(paintboxSettings), IFullscreenWindowedInputProcessor {
 

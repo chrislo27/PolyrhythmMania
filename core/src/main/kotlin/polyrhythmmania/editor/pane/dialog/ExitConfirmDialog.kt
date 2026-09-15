@@ -16,7 +16,6 @@ import paintbox.ui.layout.HBox
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.EditorScreen
 import polyrhythmmania.editor.pane.EditorPane
-import polyrhythmmania.ui.BasicDialog
 
 
 class ExitConfirmDialog(editorPane: EditorPane, val quitToScreen: () -> Screen?) : EditorDialog(editorPane) {

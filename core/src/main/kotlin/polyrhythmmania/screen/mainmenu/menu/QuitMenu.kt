@@ -1,7 +1,6 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.utils.Align
 import paintbox.font.TextAlign
 import paintbox.ui.Anchor

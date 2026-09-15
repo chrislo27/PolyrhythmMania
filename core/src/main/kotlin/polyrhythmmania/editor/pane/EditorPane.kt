@@ -190,7 +190,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
         return RectElement(Color(2 / 255f, 6 / 255f, 16 / 255f, 0.95f)).apply {
             this.border.set(Insets(2f))
             this.borderStyle.set(SolidBorder(Color().grey(0.925f, 1f)).apply {
-                this.roundedCorners.set(true)
+                this.roundedOffCorners.set(true)
             })
             this.padding.set(Insets(8f))
             
@@ -206,7 +206,7 @@ class EditorPane(val editor: Editor) : Pane(), Disposable {
             this.backgroundColor.set(Color(2 / 255f, 6 / 255f, 16 / 255f, 0.95f))
             this.border.set(Insets(2f))
             this.borderStyle.set(SolidBorder(Color().grey(0.925f, 1f)).apply { 
-                this.roundedCorners.set(true)
+                this.roundedOffCorners.set(true)
             })
         }
     }

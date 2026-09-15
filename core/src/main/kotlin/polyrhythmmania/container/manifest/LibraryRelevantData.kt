@@ -3,7 +3,6 @@ package polyrhythmmania.container.manifest
 import com.eclipsesource.json.Json
 import com.eclipsesource.json.JsonObject
 import paintbox.util.Version
-import polyrhythmmania.PRMania
 import polyrhythmmania.container.Container
 import polyrhythmmania.container.ContainerException
 import polyrhythmmania.container.LevelMetadata

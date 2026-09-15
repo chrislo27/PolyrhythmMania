@@ -22,8 +22,9 @@ object InputThresholds {
         InputResult(0f, InputType.A, 0f, 0f, 0)
         InputScore.ACE
         Ranking.SUPERB
+        @Suppress("UnusedExpression")
         AbstractEnginePlayScreen
-        
+
         // Warm up input-related code paths
         val world = World()
         val engine = Engine(SimpleTimingProvider { false }, world, null, null)

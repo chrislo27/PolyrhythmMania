@@ -98,7 +98,7 @@ class ManageCustomTexPackDialog(
                                 this.bounds.width.set(450f)
                                 
                                 this.borderStyle.set(SolidBorder(Color.LIGHT_GRAY).apply { 
-                                    this.roundedCorners.set(true)
+                                    this.roundedOffCorners.set(true)
                                 })
                                 this.border.set(Insets(2f))
                                 

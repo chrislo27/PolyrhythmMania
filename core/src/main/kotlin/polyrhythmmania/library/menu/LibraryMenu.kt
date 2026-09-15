@@ -104,7 +104,7 @@ class LibraryMenu(menuCol: MenuCollection) : StandardMenu(menuCol) {
             this.padding.set(Insets(0f))
             this.border.set(Insets(16f))
             this.borderStyle.set(SolidBorder(grey).also { border ->
-                border.roundedCorners.set(true)
+                border.roundedOffCorners.set(true)
             })
         }
 

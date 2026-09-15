@@ -8,7 +8,6 @@ import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
 import paintbox.registry.AssetRegistry
-import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawQuad
 import polyrhythmmania.engine.Engine
 import polyrhythmmania.engine.SoundInterface
@@ -229,7 +228,7 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
             vec.y += MathUtils.lerp(-1f, 0f, extendWiggleAlpha % 1f) * 0.25f * extendWiggleAlpha
         }
         
-        val tmpColor = ColorStack.getAndPush()
+        val tmpColor = Color()
         val tint = this.tint
         for (i in 0..<numLayers) {
             val tr = getTintedRegion(tileset, i)
@@ -251,7 +250,6 @@ class EntityPistonAsm(world: World) : EntityPiston(world) {
                 drawTintedRegion(batch, vec, tileset, tr, tmpColor)
             }
         }
-        ColorStack.pop()
     }
 
     override fun getTintedRegion(tileset: Tileset, index: Int): TintedRegion? {

@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.set
 import paintbox.util.wave.WaveUtils
@@ -27,7 +26,7 @@ class TitleBackground {
         val time = if (isReducedMotionOn) 0L else System.currentTimeMillis()
         val checkerboardScroll = WaveUtils.getSawtoothWave(5f, timeMs = time)
         val colourTransition = ((WaveUtils.getSineWave(15f, time) - 0.5f) / 0.5f)
-        val color = ColorStack.getAndPush().set(green).lerp(if (colourTransition < 0f) red else blue, colourTransition.absoluteValue)
+        val color = Color(green).lerp(if (colourTransition < 0f) red else blue, colourTransition.absoluteValue)
 
         batch.color = color
         batch.fillRect(0f, 0f, 1280f, 720f)
@@ -44,7 +43,5 @@ class TitleBackground {
         batch.flush()
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
         batch.setColor(1f, 1f, 1f, 1f)
-        
-        ColorStack.pop()
     }
 }

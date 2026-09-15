@@ -100,7 +100,7 @@ class TengokuBgPauseMenuHandler(screen: AbstractPlayScreen) : PauseMenuHandler(s
             this.bounds.height.set(optionsContentHeight + optionsBorderSize * 2)
             this.border.set(Insets(optionsBorderSize))
             this.borderStyle.set(SolidBorder(transparentBlack).apply {
-                this.roundedCorners.set(true)
+                roundedOffCorners.set(true)
             })
         }
         bottomPane += optionsBg

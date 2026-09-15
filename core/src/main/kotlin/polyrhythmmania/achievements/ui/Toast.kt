@@ -43,14 +43,14 @@ class Toast(val achievement: Achievement, val fulfillment: Fulfillment) : UIElem
             this.border.set(Insets(6f - 2))
             this.borderStyle.set(SolidBorder().also { border ->
                 border.color.bind { this@apply.color.use() }
-                border.roundedCorners.set(true)
+                border.roundedOffCorners.set(true)
             })
             
             // Middle border
             this += RectElement(innermostColor).also { rect ->
                 rect.border.set(Insets(3f))
                 rect.borderStyle.set(SolidBorder(middleBorderColor).apply {
-                    this.roundedCorners.set(true)
+                    this.roundedOffCorners.set(true)
                 })
                 rect += innermostRect
             }

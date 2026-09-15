@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
+import com.badlogic.gdx.math.Matrix4
 import com.badlogic.gdx.utils.Align
 import paintbox.binding.BooleanVar
 import paintbox.binding.FloatVar
@@ -22,7 +23,6 @@ import paintbox.ui.control.*
 import paintbox.ui.element.RectElement
 import paintbox.ui.layout.HBox
 import paintbox.ui.layout.VBox
-import paintbox.util.Matrix4Stack
 import polyrhythmmania.Localization
 import polyrhythmmania.editor.pane.EditorPane
 import polyrhythmmania.engine.input.Challenges
@@ -69,7 +69,7 @@ class ResultsTextDialog(editorPane: EditorPane)
             this.bounds.height.set(previewHeight)
             this.border.set(Insets(2f))
             this.borderStyle.set(SolidBorder(Color.WHITE).apply { 
-                this.roundedCorners.set(true)
+                this.roundedOffCorners.set(true)
             })
         }
         leftVbox.temporarilyDisableLayouts { 
@@ -249,7 +249,7 @@ class ResultsTextDialog(editorPane: EditorPane)
             cam.update()
 
             batch.end()
-            val prevMatrix = Matrix4Stack.getAndPush().set(batch.projectionMatrix)
+            val prevMatrix = Matrix4(batch.projectionMatrix)
             batch.projectionMatrix = cam.combined
             val frameBuffer = editor.previewFrameBuffer
             if (frameBuffer != null) {
@@ -264,8 +264,6 @@ class ResultsTextDialog(editorPane: EditorPane)
             batch.projectionMatrix = prevMatrix
             batch.begin()
         
-            Matrix4Stack.pop()
-
             batch.packedColor = lastPackedColor
         }
     }

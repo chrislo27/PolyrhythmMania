@@ -4,8 +4,10 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector2
-import paintbox.ui.*
-import paintbox.util.ColorStack
+import paintbox.ui.ClickReleased
+import paintbox.ui.Pane
+import paintbox.ui.TouchDown
+import paintbox.ui.TouchDragged
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.Editor
 import polyrhythmmania.editor.pane.EditorPane
@@ -65,7 +67,7 @@ abstract class AbstrWavePane(val musicDialog: MusicDialog) : Pane() {
         val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
-        val tmpColor: Color = ColorStack.getAndPush()
+        val tmpColor = Color()
         tmpColor.set(Color.WHITE)
 
         val window = musicDialog.window
@@ -100,7 +102,6 @@ abstract class AbstrWavePane(val musicDialog: MusicDialog) : Pane() {
             batch.fillRect(x + ((musicPlayback / durationSec) - visibleX) / visibleWidth * w, y - h, 1f, h)
         }
 
-        ColorStack.pop()
         batch.packedColor = lastPackedColor
     }
 

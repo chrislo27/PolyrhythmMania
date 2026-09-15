@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector3
-import paintbox.util.Vector3Stack
 import paintbox.util.gdxutils.drawUV
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
@@ -19,11 +18,10 @@ open class SimpleRenderedEntity(world: World) : Entity(world) {
     }
     
     override fun render(renderer: WorldRenderer, batch: Batch, tileset: Tileset) {
-        val tmpVec = Vector3Stack.getAndPush()
+        val tmpVec = Vector3()
         val convertedVec = WorldRenderer.convertWorldToScreen(tmpVec.set(getRenderVec()))
         val packedColor = batch.packedColor
         renderSimple(renderer, batch, tileset, convertedVec)
-        Vector3Stack.pop()
         batch.packedColor = packedColor
     }
     

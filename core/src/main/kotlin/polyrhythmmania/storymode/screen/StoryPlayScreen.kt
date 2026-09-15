@@ -359,8 +359,8 @@ class StoryPlayScreen(
         val dialog = RectElement(Color().grey(0f, 0.85f)).apply {
             Anchor.Centre.configure(this)    
             this.border.set(Insets(8f))
-            this.borderStyle.set(SolidBorder(Color.WHITE).apply { 
-                this.roundedCorners.set(true)
+            this.borderStyle.set(SolidBorder(Color.WHITE).apply {
+                roundedOffCorners.set(true)
             })
             this.bounds.width.set(500f)
             this.bounds.height.set(350f)

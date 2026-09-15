@@ -10,7 +10,6 @@ import paintbox.ui.control.ButtonSkin
 import paintbox.ui.control.ScrollBar
 import paintbox.ui.skin.DefaultSkins
 import paintbox.ui.skin.SkinFactory
-import paintbox.util.ColorStack
 import paintbox.util.gdxutils.fillRect
 import paintbox.util.gdxutils.fillRoundedRect
 import paintbox.util.gdxutils.grey
@@ -100,7 +99,7 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
         val rectH = contentBounds.height.get()
         val lastPackedColor = batch.packedColor
         val opacity = element.apparentOpacity.get()
-        val tmpColor = ColorStack.getAndPush()
+        val tmpColor = Color()
 
         tmpColor.set(bgColor.getOrCompute())
         tmpColor.a *= opacity
@@ -159,7 +158,6 @@ open class PRMScrollBarSkin(element: ScrollBar) : ScrollBar.ScrollBarSkin(elemen
         }
 
         batch.packedColor = lastPackedColor
-        ColorStack.pop()
     }
 }
 
@@ -185,7 +183,7 @@ open class PRMScrollBarStoryDeskSkin(element: ScrollBar) : ScrollBar.ScrollBarSk
         val rectH = contentBounds.height.get()
         val lastPackedColor = batch.packedColor
         val opacity = element.apparentOpacity.get()
-        val tmpColor = ColorStack.getAndPush()
+        val tmpColor = Color()
 
         tmpColor.set(bgColor.getOrCompute())
         tmpColor.a *= opacity
@@ -230,6 +228,5 @@ open class PRMScrollBarStoryDeskSkin(element: ScrollBar) : ScrollBar.ScrollBarSk
         }
 
         batch.packedColor = lastPackedColor
-        ColorStack.pop()
     }
 }

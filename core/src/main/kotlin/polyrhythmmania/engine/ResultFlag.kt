@@ -2,7 +2,6 @@ package polyrhythmmania.engine
 
 import paintbox.binding.ReadOnlyVar
 import polyrhythmmania.Localization
-import polyrhythmmania.engine.ResultFlag.None
 
 
 /**

@@ -1,6 +1,8 @@
 package polyrhythmmania.screen.mainmenu.menu
 
 import com.badlogic.gdx.audio.Sound
+import com.badlogic.gdx.math.Rectangle
+import com.badlogic.gdx.math.Vector2
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
 import paintbox.registry.AssetRegistry
@@ -8,8 +10,6 @@ import paintbox.ui.Anchor
 import paintbox.ui.Corner
 import paintbox.ui.Pane
 import paintbox.ui.SceneRoot
-import paintbox.util.RectangleStack
-import paintbox.util.Vector2Stack
 import paintbox.util.gdxutils.maxX
 import paintbox.util.gdxutils.maxY
 import polyrhythmmania.PRManiaGame
@@ -120,32 +120,28 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
             main.playMenuSfx(AssetRegistry.get<Sound>("sfx_menu_${if (backOut) "deselect" else "select"}"))
         }
         if (!instant) {
-            val changedBounds = RectangleStack.getAndPush().apply {
+            val changedBounds = Rectangle().apply {
                 val currentBoundsElement = menu.getTileFlipAnimationBounds()
                 val currentBounds = currentBoundsElement.bounds
-                val relToRoot = currentBoundsElement.getPosRelativeToRoot(Vector2Stack.getAndPush())
+                val relToRoot = currentBoundsElement.getPosRelativeToRoot(Vector2())
                 this.set(relToRoot.x, relToRoot.y,
                         currentBounds.width.get(), currentBounds.height.get())
-                Vector2Stack.pop()
             }
             
             val currentActive = activeMenu.getOrCompute()
             if (currentActive != null) {
-                val secondBounds = RectangleStack.getAndPush()
+                val secondBounds = Rectangle()
                 val currentActiveElement = currentActive.getTileFlipAnimationBounds()
                 val curActiveBounds = currentActiveElement.bounds
-                val relToRoot = currentActiveElement.getPosRelativeToRoot(Vector2Stack.getAndPush())
+                val relToRoot = currentActiveElement.getPosRelativeToRoot(Vector2())
                 secondBounds.set(relToRoot.x, relToRoot.y,
                         curActiveBounds.width.get(), curActiveBounds.height.get())
-                Vector2Stack.pop()
                 
                 // Merge the two rectangles to be maximal.
                 changedBounds.x = min(changedBounds.x, secondBounds.x)
                 changedBounds.y = min(changedBounds.y, secondBounds.y)
                 changedBounds.width = max(changedBounds.maxX, secondBounds.maxX) - changedBounds.x
                 changedBounds.height = max(changedBounds.maxY, secondBounds.maxY) - changedBounds.y
-                
-                RectangleStack.pop()
             }
             
             val rootWidth = 1280f
@@ -156,8 +152,6 @@ class MenuCollection(val mainMenu: MainMenuScreen, val sceneRoot: SceneRoot, val
             val tileH = (ceil(changedBounds.maxY / rootHeight * mainMenu.tilesHeight).toInt() - tileY).coerceAtLeast(1)
             mainMenu.requestTileFlip(MainMenuScreen.TileFlip(tileX, tileY, tileW, tileH,
                     if (backOut) Corner.TOP_RIGHT else Corner.TOP_LEFT))
-            
-            RectangleStack.pop()
         }
         menus.forEach { 
             if (it !== menu && it.visible.get()) {

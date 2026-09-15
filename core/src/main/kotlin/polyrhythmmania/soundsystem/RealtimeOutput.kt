@@ -3,7 +3,6 @@ package polyrhythmmania.soundsystem
 import net.beadsproject.beads.core.AudioIO
 import paintbox.binding.ReadOnlyVar
 import paintbox.binding.Var
-import polyrhythmmania.Localization
 import polyrhythmmania.soundsystem.beads.DaemonJavaSoundAudioIO
 import polyrhythmmania.soundsystem.beads.OpenALAudioIO
 import javax.sound.sampled.Mixer

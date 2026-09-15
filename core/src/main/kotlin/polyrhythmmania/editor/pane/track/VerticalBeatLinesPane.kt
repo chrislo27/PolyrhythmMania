@@ -1,8 +1,8 @@
 package polyrhythmmania.editor.pane.track
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import paintbox.binding.FloatVar
-import paintbox.util.ColorStack
 import paintbox.ui.Pane
 import paintbox.util.gdxutils.fillRect
 import polyrhythmmania.editor.Click
@@ -29,7 +29,7 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         val h = renderBounds.height.get()
         val lastPackedColor = batch.packedColor
 
-        val tmpColor = ColorStack.getAndPush()
+        val tmpColor = Color()
         val editor = editorPane.editor
         val trackView = editor.trackView
         val trackViewBeat = trackView.beat.get()
@@ -80,14 +80,12 @@ class VerticalBeatLinesPane(val editorPane: EditorPane) : Pane() {
         }
         
         if (editor.playState.getOrCompute() != PlayState.STOPPED) {
-            val tmpColor2 = ColorStack.getAndPush().set(editorPane.palette.trackPlayback.getOrCompute())
+            val tmpColor2 = Color(editorPane.palette.trackPlayback.getOrCompute())
             val pos = editor.engineBeat.get()
             batch.color = tmpColor2
             batch.fillRect(x + trackView.translateBeatToX(pos), y - h, lineWidth, h)
-            ColorStack.pop()
         }
 
-        ColorStack.pop()
         batch.packedColor = lastPackedColor
     }
 }

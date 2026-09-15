@@ -3,7 +3,6 @@ package polyrhythmmania.world.entity
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.Vector3
-import paintbox.util.ColorStack
 import paintbox.util.gdxutils.drawRect
 import polyrhythmmania.world.World
 import polyrhythmmania.world.render.WorldRenderer
@@ -32,7 +31,7 @@ class EntityCameraFrame(world: World, color: Color, val lockToCamera: Boolean = 
         val renderX = if (lockToCamera) camera.position.x - camW / 2 else vec.x
         val renderY = if (lockToCamera) camera.position.y - camH / 2 else vec.y
         
-        val tmpColor = ColorStack.getAndPush()
+        val tmpColor = Color()
         
         batch.color = tmpColor.set(this.color).apply { a *= 0.25f }
         batch.drawRect(renderX, renderY, camW, camH, 5 / 32f)
@@ -41,6 +40,5 @@ class EntityCameraFrame(world: World, color: Color, val lockToCamera: Boolean = 
         batch.drawRect(renderX, renderY, camW, camH, 1 / 32f)
         
         batch.setColor(1f, 1f, 1f, 1f)
-        ColorStack.pop()
     }
 }
